@@ -62,6 +62,7 @@ class VAE(BaseMinifiedModeModuleClass):
         * ``'nb'`` - Negative binomial distribution
         * ``'zinb'`` - Zero-inflated negative binomial distribution
         * ``'poisson'`` - Poisson distribution
+        * ``'normal'`` - Normal distribution
     latent_distribution
         One of
 
@@ -111,7 +112,7 @@ class VAE(BaseMinifiedModeModuleClass):
             Literal["gene", "gene-batch", "gene-label", "gene-cell"]
         ] = "gene",
         log_variational: Tunable[bool] = True,
-        gene_likelihood: Tunable[Literal["zinb", "nb", "poisson"]] = "zinb",
+        gene_likelihood: Tunable[Literal["zinb", "nb", "poisson", "normal"]] = "zinb",
         latent_distribution: Tunable[Literal["normal", "ln"]] = "normal",
         encode_covariates: Tunable[bool] = False,
         deeply_inject_covariates: Tunable[bool] = True,
@@ -438,6 +439,8 @@ class VAE(BaseMinifiedModeModuleClass):
             px = NegativeBinomial(mu=px_rate, theta=px_r, scale=px_scale)
         elif self.gene_likelihood == "poisson":
             px = Poisson(px_rate, scale=px_scale)
+        elif self.gene_likelihood == "normal": 
+            px = Normal(loc=px_rate, scale=px_r) # loc=mean, scale=standard deviation
 
         # Priors
         if self.use_observed_lib_size:
